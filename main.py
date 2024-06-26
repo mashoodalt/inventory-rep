@@ -170,7 +170,7 @@ for column in warehouse_columns:
 
 # Calculate and Update DataFrame for Display
 for column in warehouse_columns:
-    df[column] = df.apply(lambda row: (row[column] - (product_demands[row['product']] * warehouse_demands[column])), axis=1)
+    df[column] = df.applymap(lambda row: (row[column] - (product_demands[row['product']] * warehouse_demands[column])), axis=1)
 
 # Apply Conditional Formatting
 def color_negative(val):
