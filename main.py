@@ -170,7 +170,7 @@ for column in warehouse_columns:
 
 # Calculate and Update DataFrame for Display
 for column in warehouse_columns:
-    df[column] = df.applymap(lambda row: (row[column] - (product_demands[row['product']] * warehouse_demands[column])), axis=1)
+    df[column] = df.map(lambda row: (row[column] - (product_demands[row['product']] * warehouse_demands[column])), axis=1)
 
 # Apply Conditional Formatting
 def color_negative(val):
@@ -195,8 +195,8 @@ st.header("Quantity - Advanced Orders - Benchmark")
 
 df['Total Inventory'] = df.iloc[:, 1:].sum(axis=1)  # Sum across rows starting from the second column
 
-
-st.dataframe(df.style.map(color_negative, subset=warehouse_columns))
+st.dataframe(df)
+# st.dataframe(df.style.map(color_negative, subset=warehouse_columns))
 
 
 recs, df_transfers = generate_recommendations(df)
