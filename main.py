@@ -305,7 +305,7 @@ st.header("Quantity - Advance Orders - Benchmark")
 
 df = df.astype(int)
 
-df['Total Inventory'] = df.iloc[:, 1:].sum(axis=1)  # Sum across rows starting from the second column
+df['Total Inventory'] = df.iloc[:, 0:].sum(axis=1)  # Sum across rows starting from the second column
 
 # st.dataframe(df)
 st.dataframe(df.style.applymap(color_negative, subset=warehouse_columns))
