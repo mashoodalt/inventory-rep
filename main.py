@@ -307,8 +307,8 @@ df = df.astype(int)
 
 df['Total Inventory'] = df.iloc[:, 1:].sum(axis=1)  # Sum across rows starting from the second column
 
-
-st.dataframe(df.style.map(color_negative, subset=warehouse_columns))
+st.dataframe(df)
+# st.dataframe(df.style.map(color_negative, subset=warehouse_columns))
 
 
 recs, df_transfers = generate_recommendations(df)
