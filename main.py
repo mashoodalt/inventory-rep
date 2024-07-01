@@ -282,7 +282,7 @@ for column in warehouse_columns:
 
 # Apply Conditional Formatting
 def color_negative(val):
-    color = 'orange' if val < 0 else 'black'
+    color = 'orange' if val < 0 else 'white'
     return f'color: {color}'
 
 # st.header("Available Quantity")
