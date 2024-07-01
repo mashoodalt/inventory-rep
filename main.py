@@ -29,15 +29,15 @@ url = "https://docs.google.com/spreadsheets/d/1NwKMHFMklbu-fRvTjv1e7-XlN34SzckWJ
 st.set_page_config(layout="wide")
 
 email_mapping = {
-    "Athara Hazari": "muhammmadmashood23@gmail.com",
-    "Bhowana": "mashood@altventures.co",
-    "Chund Bharwana": "muhammmadmashood23@gmail.com",
-    "Garh Maharaja": "mashood@altventures.co",
-    "Lallian": "muhammmadmashood23@gmail.com",
-    "Hafizabad": "mashood@altventures.co",
-    "KDuakaan": "mashood@altventures.co",
-    "TTS/Stock": "muhammmadmashood23@gmail.com",
-    "Purchase": "mashood@altventures.co",
+    "Athara Hazari": "saqlain.akmal@din.global",
+    "Bhowana": "saqlain.akmal@din.global",
+    "Chund Bharwana": "saqlain.akmal@din.global",
+    "Garh Maharaja": "saqlain.akmal@din.global",
+    "Lallian": "saqlain.akmal@din.global",
+    "Hafizabad": "saqlain.akmal@din.global",
+    "KDuakaan": "saqlain.akmal@din.global",
+    "TTS/Stock": "saqlain.akmal@din.global",
+    "Purchase": "saqlain.akmal@din.global",
 }
 
 
@@ -58,7 +58,7 @@ def generate_recommendations(df):
             df[column] = pd.to_numeric(df[column], errors='coerce')
 
     for index, row in df.iterrows():
-        product = row['product']
+        product = row.name #['product']
         
         # surplus_warehouses = {col: val for col, val in row.items() if pd.notna(val) and val > 0 and col != 'product'}
         # deficit_warehouses = {col: abs(val) for col, val in row.items() if pd.notna(val) and val < 0 and col != 'product'}
@@ -115,24 +115,130 @@ def generate_recommendations(df):
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-data = conn.read(spreadsheet=url, usecols=range(0,9))
+data = conn.read(spreadsheet=url, worksheet=616531341)
+
+# def load_inventory_data():
+#     data = conn.read(spreadsheet=url, worksheet="1092163554")
+#     return data
 
 def load_inventory_data():
-    data = conn.read(spreadsheet=url, worksheet="1092163554")
-    return data
+
+    data = conn.read(spreadsheet=url, worksheet="1321480954")    
+    
+    df = pd.DataFrame(data)
+    # Assume the first row of your DataFrame should become the header
+    new_header = df.iloc[0]  # capture the first row for the header
+    df = df[1:]  # take the data less the header row
+    df.columns = new_header  # set the header row as the df header
+
+    # Reset the index of the DataFrame
+    df.reset_index(drop=True, inplace=True)
+
+    
+    
+    
+    return df
+
+
+
+# def load_advanced_orders():
+#     #1125866982
+#     data = conn.read(spreadsheet=url, worksheet="1125866982")
+#     return data
+
 
 def load_advanced_orders():
-    #1125866982
-    data = conn.read(spreadsheet=url, worksheet="1125866982")
-    return data
+    # Assuming 'conn.read' function loads data into a DataFrame
+    # and the spreadsheet URL is already defined somewhere as 'url'.
+    # Update: 'worksheet' should be the name or index of the sheet to read.
+    data = conn.read(spreadsheet=url, worksheet="797478918")
+    
+    df = pd.DataFrame(data)
+    # Assume the first row of your DataFrame should become the header
+    new_header = df.iloc[0]  # capture the first row for the header
+    df = df[1:]  # take the data less the header row
+    df.columns = new_header  # set the header row as the df header
+
+    # Reset the index of the DataFrame
+    df.reset_index(drop=True, inplace=True)
+
+    
+    
+    # # data = g_data.get_all_values()
+
+    # # Convert the data to a pandas DataFrame
+    # header = data.get(0)
+    # print(header)
+    # rows = data[1:]
+    # df = pd.DataFrame(rows, columns=header)
+
+    # Display the DataFrame to verify
+    # print(df)
+    
+
+    # Display the DataFrame to verify1
+    # print(dataFrame)
+    
+    
+    # Assuming the first two rows are headers and the first one might be merged
+    # Adjusting headers if the first row is empty or not needed
+    # Skip rows if needed (e.g., first row is merged and used as a title)
+    # print(df[])# Adjust the number here based on the actual row where data starts
+    
+    # if df.iloc[0, 0] == "" or pd.isnull(df.iloc[0, 0]):
+    #     df.columns = df.iloc[1]
+    #     df = df[:1]
+    # df.reset_index(drop=True, inplace=True)
+    
+    # # Convert numeric columns from strings to float or int as appropriate
+    # for col in df.columns:
+    #     try:
+    #         df[col] = pd.to_numeric(df[col])
+    #     except ValueError:
+    #         pass  # Keep as object type if conversion fails
+
+    # # Convert to proper DataFrame, ensuring all numeric types are correct
+    return df
+
+
+
+
 
 # Load data (placeholders for demonstration)
 inventory_data = load_inventory_data()  # This would be your actual function call
 advanced_orders = load_advanced_orders()  # This would be your actual function call
 
+# Remove 'Grand Total' row for clean numeric operations
+df_inventory = inventory_data[inventory_data['product'] != 'Grand Total']
+df_orders = advanced_orders[advanced_orders['product'] != 'Grand Total']
 
+# Set product as index
+df_inventory.set_index('product', inplace=True)
+df_orders.set_index('product', inplace=True)
 
-df = pd.DataFrame(data)
+# Fill None with zeros and convert to numeric types
+df_inventory = df_inventory.apply(pd.to_numeric, errors='coerce').fillna(0)
+df_orders = df_orders.apply(pd.to_numeric, errors='coerce').fillna(0)
+
+# Align both dataframes to have the same columns
+all_columns = set(df_inventory.columns).union(set(df_orders.columns))
+df_inventory = df_inventory.reindex(columns=all_columns, fill_value=0)
+df_orders = df_orders.reindex(columns=all_columns, fill_value=0)
+
+# Subtract to compute the result
+df_result = df_inventory.subtract(df_orders)
+
+# Print the result
+print(df_result)
+
+# st.dataframe(df_result)
+
+# index_list = df_result.index.tolist()
+# st.write(index_list)
+
+df = df_result
+
+# df = pd.DataFrame(data)
 
 # st.dataframe(df)
 
@@ -147,7 +253,7 @@ df = pd.DataFrame(data)
 
 
 # Assuming you know the columns that represent warehouses
-warehouse_columns = ['Athara Hazari', 'Bhowana', 'Chund Bharwana', "Garrh Maharaja", "Lallian", "Hafizabad", "KDukaan", "TTS/Stock"]  # Add all your warehouse columns here
+warehouse_columns = ['Athara Hazari', 'Bhowana', 'Chund Bharwana',  "Lallian", "Hafizabad", "KDukaan", "Chak 137", "Garrh Maharaja", "Other"]  # Add all your warehouse columns here
 
 # User Inputs for Demand Multipliers
 with open("logo.svg", "r") as file:
@@ -160,7 +266,7 @@ st.sidebar.markdown(svg, unsafe_allow_html=True)
 st.sidebar.header("Set Benchmark Quantities for Each Product")
 
 product_demands = {}
-for product in df['product']:
+for product in df.index.to_list():
     product_demands[product] = st.sidebar.number_input(f"Demand for {product}", min_value=0, value=10)
 
 st.sidebar.header("Set Demand Constants for Each Warehouse")
@@ -170,7 +276,9 @@ for column in warehouse_columns:
 
 # Calculate and Update DataFrame for Display
 for column in warehouse_columns:
-    df[column] = df.apply(lambda row: (row[column] - (product_demands[row['product']] * warehouse_demands[column])), axis=1)
+    df[column] = df.apply(lambda row: (row[column] - (product_demands[row.name] * warehouse_demands[column])), axis=1)
+    # df[column] = df.apply(lambda row: (row[column] - (product_demands[row['product']] * warehouse_demands[column])), axis=1)
+    pass
 
 # Apply Conditional Formatting
 def color_negative(val):
@@ -186,12 +294,16 @@ st.header("Available Quantity of Inventory")
 st.dataframe(inventory_data)  # Display your inventory DataFrame here
 
 # Displaying advanced orders
-st.header("Advanced Orders")
+st.header("Advance Orders")
 st.dataframe(advanced_orders)  # Display your advanced orders DataFrame here
 
+
+
 # Display current table under a new heading
-st.header("Quantity - Advanced Orders - Benchmark")
+st.header("Quantity - Advance Orders - Benchmark")
 # Assuming 'df' is the DataFrame you're currently displaying
+
+df = df.astype(int)
 
 df['Total Inventory'] = df.iloc[:, 1:].sum(axis=1)  # Sum across rows starting from the second column
 
@@ -210,7 +322,7 @@ deficit_products = df[df['Total Inventory'] < 0]
 # Generate purchase recommendations
 recommendations = []
 for index, row in deficit_products.iterrows():
-    product = row['product']
+    product = row.name  #['product']
     needed_units = -row['Total Inventory']  # Calculate how many units are needed to reach zero
     recommendations.append(f"Purchase {needed_units} more units of {product} to meet the demand.")
 
