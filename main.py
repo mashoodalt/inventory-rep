@@ -252,8 +252,8 @@ df = df_result
 
 
 
-# Assuming you know the columns that represent warehouses
-warehouse_columns = ['Athara Hazari', 'Bhowana', 'Chund Bharwana',  "Lallian", "Hafizabad", "KDukaan", "Chak 149", "Garrh Maharaja", "Other"]  # Add all your warehouse columns here
+# Assuming you know the columns that represent warehouses "Chak 149",
+warehouse_columns = ['Athara Hazari', 'Bhowana', 'Chund Bharwana',  "Lallian", "Hafizabad", "KDukaan",  "Garrh Maharaja", "Other"]  # Add all your warehouse columns here
 
 # User Inputs for Demand Multipliers
 with open("logo.svg", "r") as file:
