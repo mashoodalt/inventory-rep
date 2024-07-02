@@ -35,7 +35,7 @@ email_mapping = {
     "Garh Maharaja": "saqlain.akmal@din.global",
     "Lallian": "saqlain.akmal@din.global",
     "Hafizabad": "saqlain.akmal@din.global",
-    "KDuakaan": "saqlain.akmal@din.global",
+    "KDukaan": "saqlain.akmal@din.global",
     "TTS/Stock": "saqlain.akmal@din.global",
     "Purchase": "saqlain.akmal@din.global",
 }
